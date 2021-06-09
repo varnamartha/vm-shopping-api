@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\vm-shopping-business\vm-shopping-business.csproj" />
     <ProjectReference Include="..\vm-shopping-data-access\vm-shopping-data-access.csproj" />
   </ItemGroup>
 
