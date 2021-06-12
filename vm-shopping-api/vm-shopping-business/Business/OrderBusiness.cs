@@ -7,6 +7,8 @@ using vm_shopping_data_access.Entities;
 using vm_shopping_business.Interfaces;
 using vm_shopping_models.Entities;
 using vm_shopping_models.Enum;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace vm_shopping_business.Business
 {
@@ -25,7 +27,7 @@ namespace vm_shopping_business.Business
             this.productBusiness = productBusiness;
         }
 
-        public async Task<OrderResponse> CreateOrderAsync(OrderRequest orderRequest)
+        public async Task<OrderResponse> CreateOrder(OrderRequest orderRequest)
         {
             Amount amount = new Amount(orderRequest.Product.Price, orderRequest.Product.Currency);
             Payment payment = new Payment(orderRequest.Product.Name, orderRequest.Product.Description, amount);
@@ -39,13 +41,52 @@ namespace vm_shopping_business.Business
             RedirectResponse response = gatewaySession.Session().Request(request);
             if (response.IsSuccessful())
             {
-                return await SaveOrderAsync(orderRequest, response.ProcessUrl, response.RequestId);
+                return await SaveOrder(orderRequest, response.ProcessUrl, response.RequestId);
             }
 
             return new OrderResponse();
         }
 
-        internal async Task<OrderResponse> SaveOrderAsync(OrderRequest orderRequest, string GatewayUrlRedirection, string GatewayPaymentId)
+        public async Task<OrderResponse> GetOrder(int orderId)
+        {
+            OrderResponse orderResponse = null;
+            try
+            {
+                using (shoppingDBContext)
+                {
+                    var order = shoppingDBContext.Order
+                        .Include(x => x.Status)
+                        .Include(x => x.Product)
+                        .Where(o => o.Id == orderId).FirstOrDefault();
+
+                    if(order != null)
+                    {
+                        orderResponse = new OrderResponse();
+                        orderResponse.ShoppingOrderId = order.Id;
+                        orderResponse.URLRedirection = order.GatewayUrlRedirection;
+                        orderResponse.Status = new StatusResponse 
+                        { 
+                            Id = order.Status.Id, 
+                            Status = order.Status.Description 
+                        };
+                        orderResponse.Product = new ProductResponse
+                        {
+                            ProductId = order.Product.Id,
+                            Name = order.Product.Name,
+                            Description = order.Product.Description,
+                            Price = order.Product.Price
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //ToDo: Log
+            }
+            return orderResponse;
+        }
+
+        internal async Task<OrderResponse> SaveOrder(OrderRequest orderRequest, string GatewayUrlRedirection, string GatewayPaymentId)
         {
             var orderResponse = new OrderResponse();
             try
@@ -66,8 +107,21 @@ namespace vm_shopping_business.Business
                     };
                     shoppingDBContext.Add(order);
                     await shoppingDBContext.SaveChangesAsync();
+                    
                     orderResponse.ShoppingOrderId = order.Id;
                     orderResponse.URLRedirection = order.GatewayUrlRedirection;
+                    orderResponse.Status = new StatusResponse
+                    {
+                        Id = (int)OrderStatus.CREATED,
+                        Status = Enum.GetName(typeof(OrderStatus), OrderStatus.CREATED)
+                    };
+                    orderResponse.Product = new ProductResponse
+                    {
+                        ProductId = product.ProductId,
+                        Name = product.Name,
+                        Description = product.Description,
+                        Price = product.Price
+                    };
                 }
             }
             catch (Exception ex)
