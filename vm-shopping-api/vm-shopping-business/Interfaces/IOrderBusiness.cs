@@ -5,6 +5,7 @@ namespace vm_shopping_business.Interfaces
 {
     public interface IOrderBusiness
     {
-        Task<OrderResponse> CreateOrderAsync(OrderRequest orderRequest);
+        Task<OrderResponse> CreateOrder(OrderRequest orderRequest);
+        Task<OrderResponse> GetOrder(int orderId);
     }
 }
