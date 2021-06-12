@@ -9,7 +9,7 @@ using vm_shopping_models.Entities;
 using vm_shopping_models.Enum;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 
 namespace vm_shopping_business.Business
 {
@@ -34,10 +34,10 @@ namespace vm_shopping_business.Business
             Payment payment = new Payment(orderRequest.Product.Name, orderRequest.Product.Description, amount);
 
             RedirectRequest request = new RedirectRequest(payment,
-                "https://shopping.com/orders/20",//ToDo: Move returnUrl to config
+                Environment.GetEnvironmentVariable("PlacetoUrlWebhook"),
                 Utils.GetLocalIPAddress(),
-                "API",//ToDo: Move user agent to config
-                 DateTime.Now.AddMinutes(5).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss"));
+                Environment.GetEnvironmentVariable("PlacetoUserAgent"),
+                DateTime.Now.AddMinutes(5).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss"));
 
             RedirectResponse response = gatewaySession.Session().Request(request);
             if (response.IsSuccessful())
@@ -54,9 +54,9 @@ namespace vm_shopping_business.Business
             try
             {
                 var order = shoppingDBContext.Order
-                         .Include(x => x.Status)
-                         .Include(x => x.Product)
-                         .Where(o => o.Id == orderId).FirstOrDefault();
+                        .Include(x => x.Status)
+                        .Include(x => x.Product)
+                        .Where(o => o.Id == orderId).FirstOrDefault();
 
                 if (order != null)
                 {
@@ -84,47 +84,6 @@ namespace vm_shopping_business.Business
             return orderResponse;
         }
 
-        public async Task<List<OrderResponse>> GetClientOrders(string email)
-        {
-            List<OrderResponse> orders = new List<OrderResponse>();
-            try
-            {
-                var clientOrders = shoppingDBContext.Order
-                        .Include(x => x.Customer)
-                        .Include(x => x.Status)
-                        .Include(x => x.Product)
-                        .Where(o => o.Customer.Mail == email).ToList();
-
-                if (clientOrders.Any())
-                {
-                    foreach (var clientOrder in clientOrders)
-                    {
-                        var orderResponse = new OrderResponse();
-                        orderResponse.ShoppingOrderId = clientOrder.Id;
-                        orderResponse.URLRedirection = clientOrder.GatewayUrlRedirection;
-                        orderResponse.Status = new StatusResponse
-                        {
-                            Id = clientOrder.Status.Id,
-                            Status = clientOrder.Status.Description
-                        };
-                        orderResponse.Product = new ProductResponse
-                        {
-                            ProductId = clientOrder.Product.Id,
-                            Name = clientOrder.Product.Name,
-                            Description = clientOrder.Product.Description,
-                            Price = clientOrder.Product.Price
-                        };
-                        orders.Add(orderResponse);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                //ToDo: Log
-            }
-            return orders;
-        }
-
         internal async Task<OrderResponse> SaveOrder(OrderRequest orderRequest, string GatewayUrlRedirection, string GatewayPaymentId)
         {
             var orderResponse = new OrderResponse();
@@ -132,33 +91,36 @@ namespace vm_shopping_business.Business
             {
                 var client = await clientBusiness.SaveClient(orderRequest.Client);
                 var product = await productBusiness.SaveProduct(orderRequest.Product);
-                var order = new Order
+                using (shoppingDBContext)
                 {
-                    ProductId = product.ProductId,
-                    CustomerId = client.ClientId,
-                    GatewayPaymentId = GatewayPaymentId,
-                    GatewayUrlRedirection = GatewayUrlRedirection,
-                    StatusId = (int)OrderStatus.CREATED,
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now
-                };
-                shoppingDBContext.Add(order);
-                await shoppingDBContext.SaveChangesAsync();
+                    var order = new Order
+                    {
+                        ProductId = product.ProductId,
+                        CustomerId = client.ClientId,
+                        GatewayPaymentId = GatewayPaymentId,
+                        GatewayUrlRedirection = GatewayUrlRedirection,
+                        StatusId = (int)OrderStatus.CREATED,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now
+                    };
+                    shoppingDBContext.Add(order);
+                    await shoppingDBContext.SaveChangesAsync();
 
-                orderResponse.ShoppingOrderId = order.Id;
-                orderResponse.URLRedirection = order.GatewayUrlRedirection;
-                orderResponse.Status = new StatusResponse
-                {
-                    Id = (int)OrderStatus.CREATED,
-                    Status = Enum.GetName(typeof(OrderStatus), OrderStatus.CREATED)
-                };
-                orderResponse.Product = new ProductResponse
-                {
-                    ProductId = product.ProductId,
-                    Name = product.Name,
-                    Description = product.Description,
-                    Price = product.Price
-                };
+                    orderResponse.ShoppingOrderId = order.Id;
+                    orderResponse.URLRedirection = order.GatewayUrlRedirection;
+                    orderResponse.Status = new StatusResponse
+                    {
+                        Id = (int)OrderStatus.CREATED,
+                        Status = Enum.GetName(typeof(OrderStatus), OrderStatus.CREATED)
+                    };
+                    orderResponse.Product = new ProductResponse
+                    {
+                        ProductId = product.ProductId,
+                        Name = product.Name,
+                        Description = product.Description,
+                        Price = product.Price
+                    };
+                }
             }
             catch (Exception ex)
             {
