@@ -20,27 +20,24 @@ namespace vm_shopping_business
             var clientResponse = new ClientResponse();
             try
             {
-                using (shoppingDBContext)
+                var currentClient = shoppingDBContext.Customer.Where(t => t.Mail == client.Mail).FirstOrDefault();
+                if (currentClient == null)
                 {
-                    var currentClient = shoppingDBContext.Customer.Where(t => t.Mail == client.Mail).FirstOrDefault();
-                    if (currentClient == null)
+                    Customer customer = new Customer
                     {
-                        Customer customer = new Customer
-                        {
-                            Name = client.Name,
-                            Mail = client.Mail,
-                            Phone = client.Phone
-                        };
-                        shoppingDBContext.Add(customer);
-                        await shoppingDBContext.SaveChangesAsync();
-                        currentClient = customer;
-                    }
-
-                    clientResponse.ClientId = currentClient.Id;
-                    clientResponse.Name = currentClient.Name;
-                    clientResponse.Email = currentClient.Mail;
-                    clientResponse.Phone = currentClient.Phone;
+                        Name = client.Name,
+                        Mail = client.Mail,
+                        Phone = client.Phone
+                    };
+                    shoppingDBContext.Add(customer);
+                    await shoppingDBContext.SaveChangesAsync();
+                    currentClient = customer;
                 }
+
+                clientResponse.ClientId = currentClient.Id;
+                clientResponse.Name = currentClient.Name;
+                clientResponse.Email = currentClient.Mail;
+                clientResponse.Phone = currentClient.Phone;
             }
             catch (Exception ex)
             {
