@@ -1,5 +1,4 @@
-﻿{
-  "$schema": "http://json.schemastore.org/launchsettings.json",
+{
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
@@ -8,23 +7,26 @@
       "sslPort": 44376
     }
   },
+  "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
       "launchUrl": "api/order",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "PlacetoUserAgent": "Api VM Shopping ",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "PlacetoUrlWebhook": "https://shopping.com/orders/placeto/response"
       }
     },
     "vm_shopping_api": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "api/order",
-      "applicationUrl": "https://localhost:5001;http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "https://localhost:5001;http://localhost:5000"
     }
   }
 }
