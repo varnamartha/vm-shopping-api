@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using vm_shopping_business.Interfaces;
 using vm_shopping_models.Entities;
@@ -34,6 +35,27 @@ namespace vm_shopping_api.Controllers
                     return Ok(orderResponse);
                 } 
                 return NotFound();
+            }
+            catch (Exception ex)
+            {
+                //ToDo: Logg
+                return StatusCode(500);
+            }
+        }
+
+        [HttpGet]
+        [Route("list")]
+        public async Task<ActionResult> GetClientOrders([FromQuery(Name = "email")] string email)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(email))
+                {
+                    return new BadRequestResult();
+                }
+
+                List<OrderResponse> orders = await orderBusiness.GetClientOrders(email);
+                return Ok(orders);
             }
             catch (Exception ex)
             {
