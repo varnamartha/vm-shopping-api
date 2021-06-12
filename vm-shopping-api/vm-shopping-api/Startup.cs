@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using vm_shopping_data_access;
+using Microsoft.OpenApi.Models;
 
 namespace vm_shopping_api
 {
@@ -31,6 +32,10 @@ namespace vm_shopping_api
             services.AddDbContext<ShoppingDBContext>(options =>
                                                      options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Transient, ServiceLifetime.Singleton);
             DependenciesResolver.ServicesResolve(services);
+
+            // add swagger
+            // Register the Swagger generator, defining 1 or more Swagger documents
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,6 +55,12 @@ namespace vm_shopping_api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My Shopping Api");
             });
         }
     }
