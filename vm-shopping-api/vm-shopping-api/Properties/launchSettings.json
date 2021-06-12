@@ -16,7 +16,7 @@
       "environmentVariables": {
         "PlacetoUserAgent": "Api VM Shopping ",
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "PlacetoUrlWebhook": "https://shopping.com/orders/placeto/response"
+        "PlacetoUrlWebhook": "https://8983b0d6745b.ngrok.io/api/order/notification"
       }
     },
     "vm_shopping_api": {

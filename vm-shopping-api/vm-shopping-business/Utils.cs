@@ -8,6 +8,9 @@ namespace vm_shopping_business
 {
     class Utils
     {
+
+        public static string dateIso8601Format = "yyyy'-'MM'-'dd'T'HH':'mm':'ss";
+
         public static string GetLocalIPAddress()
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
@@ -20,5 +23,6 @@ namespace vm_shopping_business
             }
             throw new Exception("No network adapters with an IPv4 address in the system!");
         }
+
     }
 }

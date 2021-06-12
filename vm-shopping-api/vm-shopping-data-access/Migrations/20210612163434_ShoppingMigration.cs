@@ -7,8 +7,6 @@ namespace vm_shopping_data_access.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            Down(migrationBuilder);
-
             migrationBuilder.CreateTable(
                 name: "Customer",
                 columns: table => new
@@ -88,6 +86,30 @@ namespace vm_shopping_data_access.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "PaymentNotification",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderId = table.Column<int>(type: "int", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Reference = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Signature = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaymentNotification", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PaymentNotification_Order_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Order",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Order_CustomerId",
                 table: "Order",
@@ -103,6 +125,11 @@ namespace vm_shopping_data_access.Migrations
                 table: "Order",
                 column: "StatusId");
 
+            migrationBuilder.CreateIndex(
+                name: "IX_PaymentNotification_OrderId",
+                table: "PaymentNotification",
+                column: "OrderId");
+
             //Populating Status table
             migrationBuilder.Sql("INSERT INTO Status(Id,Description) Values(1,'CREATED')");
             migrationBuilder.Sql("INSERT INTO Status(Id,Description) Values(2,'PAYED')");
@@ -111,6 +138,9 @@ namespace vm_shopping_data_access.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "PaymentNotification");
+
             migrationBuilder.DropTable(
                 name: "Order");
 

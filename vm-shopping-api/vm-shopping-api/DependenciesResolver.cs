@@ -17,6 +17,7 @@ namespace vm_shopping_api
             services.AddSingleton<IGatewaySession, GatewaySession>();
             services.AddSingleton<IProductBusiness, ProductBusiness>();
             services.AddSingleton<IOrderBusiness, OrderBusiness>();
+            services.AddSingleton<INotificationBusiness, NotificationBusiness>();
         }
     }
 }
