@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace vm_shopping_data_access.Migrations
 {
-    public partial class Initial : Migration
+    public partial class ShoppingMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            Down(migrationBuilder);
+
             migrationBuilder.CreateTable(
                 name: "Customer",
                 columns: table => new
@@ -29,7 +31,8 @@ namespace vm_shopping_data_access.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<double>(type: "float", nullable: false)
+                    Price = table.Column<double>(type: "float", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -40,8 +43,7 @@ namespace vm_shopping_data_access.Migrations
                 name: "Status",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -56,6 +58,7 @@ namespace vm_shopping_data_access.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     GatewayPaymentId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    GatewayUrlRedirection = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     CustomerId = table.Column<int>(type: "int", nullable: false),
                     StatusId = table.Column<int>(type: "int", nullable: false),
@@ -99,6 +102,11 @@ namespace vm_shopping_data_access.Migrations
                 name: "IX_Order_StatusId",
                 table: "Order",
                 column: "StatusId");
+
+            //Populating Status table
+            migrationBuilder.Sql("INSERT INTO Status(Id,Description) Values(1,'CREATED')");
+            migrationBuilder.Sql("INSERT INTO Status(Id,Description) Values(2,'PAYED')");
+            migrationBuilder.Sql("INSERT INTO Status(Id,Description) Values(3,'REJECTED')");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
