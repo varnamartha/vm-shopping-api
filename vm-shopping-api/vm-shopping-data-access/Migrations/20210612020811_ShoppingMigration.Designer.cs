@@ -10,15 +10,15 @@ using vm_shopping_data_access;
 namespace vm_shopping_data_access.Migrations
 {
     [DbContext(typeof(ShoppingDBContext))]
-    [Migration("20210609014923_Initial")]
-    partial class Initial
+    [Migration("20210612020811_ShoppingMigration")]
+    partial class ShoppingMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.6")
+                .HasAnnotation("ProductVersion", "5.0.7")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("vm_shopping_data_access.Entities.Customer", b =>
@@ -61,6 +61,9 @@ namespace vm_shopping_data_access.Migrations
                     b.Property<string>("GatewayPaymentId")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("GatewayUrlRedirection")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
@@ -88,6 +91,9 @@ namespace vm_shopping_data_access.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
@@ -102,9 +108,7 @@ namespace vm_shopping_data_access.Migrations
             modelBuilder.Entity("vm_shopping_data_access.Entities.Status", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");

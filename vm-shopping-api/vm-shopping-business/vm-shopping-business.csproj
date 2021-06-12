@@ -6,6 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Autofac" Version="6.2.0" />
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\vm-shopping-data-access\vm-shopping-data-access.csproj" />
+    <ProjectReference Include="..\vm-shopping-models\vm-shopping-models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\ExternalReferences\Release\Newtonsoft.Json.dll</HintPath>
     </Reference>

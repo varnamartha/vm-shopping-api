@@ -29,7 +29,8 @@ namespace vm_shopping_api
         {
             services.AddControllers();
             services.AddDbContext<ShoppingDBContext>(options =>
-                                                     options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                                                     options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Transient, ServiceLifetime.Singleton);
+            DependenciesResolver.ServicesResolve(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
