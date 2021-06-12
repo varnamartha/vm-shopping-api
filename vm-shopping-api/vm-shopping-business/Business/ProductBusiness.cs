@@ -19,27 +19,24 @@ namespace vm_shopping_business.Business
             var productResponse = new ProductResponse();
             try
             {
-                using (shoppingDBContext)
+                var currentProduct = shoppingDBContext.Product.Where(t => t.Id == product.ProductId).FirstOrDefault();
+                if (currentProduct == null)
                 {
-                    var currentProduct = shoppingDBContext.Product.Where(t => t.Id == product.ProductId).FirstOrDefault();
-                    if (currentProduct == null)
+                    Product newProduct = new Product
                     {
-                        Product newProduct = new Product
-                        {
-                            Name = product.Name,
-                            Price = product.Price,
-                            Description = product.Description
-                        };
-                        shoppingDBContext.Add(newProduct);
-                        await shoppingDBContext.SaveChangesAsync();
-                        currentProduct = newProduct;
-                    }
-
-                    productResponse.ProductId = currentProduct.Id;
-                    productResponse.Name = currentProduct.Name;
-                    productResponse.Description = currentProduct.Description;
-                    productResponse.Price = currentProduct.Price;
+                        Name = product.Name,
+                        Price = product.Price,
+                        Description = product.Description
+                    };
+                    shoppingDBContext.Add(newProduct);
+                    await shoppingDBContext.SaveChangesAsync();
+                    currentProduct = newProduct;
                 }
+
+                productResponse.ProductId = currentProduct.Id;
+                productResponse.Name = currentProduct.Name;
+                productResponse.Description = currentProduct.Description;
+                productResponse.Price = currentProduct.Price;
             }
             catch (Exception ex)
             {
