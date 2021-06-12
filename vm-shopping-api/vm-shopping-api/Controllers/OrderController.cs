@@ -13,9 +13,12 @@ namespace vm_shopping_api.Controllers
     {
         public readonly IOrderBusiness orderBusiness;
 
-        public OrderController(IOrderBusiness orderBusiness)
+        public readonly INotificationBusiness notificationBusiness;
+
+        public OrderController(IOrderBusiness orderBusiness, INotificationBusiness notificationBusiness)
         {
             this.orderBusiness = orderBusiness;
+            this.notificationBusiness = notificationBusiness;
         }
 
         [HttpGet]
@@ -71,6 +74,22 @@ namespace vm_shopping_api.Controllers
             {
                 OrderResponse orderResponse = await orderBusiness.CreateOrder(orderRequest);
                 return Ok(orderResponse);
+            }
+            catch (Exception ex)
+            {
+                //ToDo: Logg
+                return StatusCode(500);
+            }
+        }
+
+        [HttpPost]
+        [Route("notification")]
+        public async Task<ActionResult> OrderPaymentNotification([FromBody] PaymentNotificationRequest paymentNotificationRequest)
+        {
+            try
+            {
+                var notificationResponse = await notificationBusiness.PaymentNotificationSync(paymentNotificationRequest);
+                return Ok(notificationResponse);
             }
             catch (Exception ex)
             {
