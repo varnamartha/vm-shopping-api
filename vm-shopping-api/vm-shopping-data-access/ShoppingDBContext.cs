@@ -29,9 +29,7 @@ namespace vm_shopping_data_access
                    .Property(c => c.Id)
                    .ValueGeneratedOnAdd();
 
-                modelBuilder.Entity<Status>()
-                  .Property(c => c.Id)
-                  .ValueGeneratedOnAdd();
+                modelBuilder.Entity<Status>();
 
                 modelBuilder.Entity<Order>()
                  .Property(c => c.Id)
