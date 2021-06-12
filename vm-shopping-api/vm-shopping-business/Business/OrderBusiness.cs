@@ -38,7 +38,7 @@ namespace vm_shopping_business.Business
                 Environment.GetEnvironmentVariable("PlacetoUrlWebhook"),
                 Utils.GetLocalIPAddress(),
                 Environment.GetEnvironmentVariable("PlacetoUserAgent"),
-                DateTime.Now.AddMinutes(5).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss"));
+                DateTime.Now.AddMinutes(5).ToString(Utils.dateIso8601Format));
 
             RedirectResponse response = gatewaySession.Session().Request(request);
             if (response.IsSuccessful())
@@ -133,36 +133,34 @@ namespace vm_shopping_business.Business
             {
                 var client = await clientBusiness.SaveClient(orderRequest.Client);
                 var product = await productBusiness.SaveProduct(orderRequest.Product);
-                using (shoppingDBContext)
-                {
-                    var order = new Order
-                    {
-                        ProductId = product.ProductId,
-                        CustomerId = client.ClientId,
-                        GatewayPaymentId = GatewayPaymentId,
-                        GatewayUrlRedirection = GatewayUrlRedirection,
-                        StatusId = (int)OrderStatus.CREATED,
-                        CreatedAt = DateTime.Now,
-                        UpdatedAt = DateTime.Now
-                    };
-                    shoppingDBContext.Add(order);
-                    await shoppingDBContext.SaveChangesAsync();
 
-                    orderResponse.ShoppingOrderId = order.Id;
-                    orderResponse.URLRedirection = order.GatewayUrlRedirection;
-                    orderResponse.Status = new StatusResponse
-                    {
-                        Id = (int)OrderStatus.CREATED,
-                        Status = Enum.GetName(typeof(OrderStatus), OrderStatus.CREATED)
-                    };
-                    orderResponse.Product = new ProductResponse
-                    {
-                        ProductId = product.ProductId,
-                        Name = product.Name,
-                        Description = product.Description,
-                        Price = product.Price
-                    };
-                }
+                var order = new Order
+                {
+                    ProductId = product.ProductId,
+                    CustomerId = client.ClientId,
+                    GatewayPaymentId = GatewayPaymentId,
+                    GatewayUrlRedirection = GatewayUrlRedirection,
+                    StatusId = (int)OrderStatus.CREATED,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                };
+                shoppingDBContext.Add(order);
+                await shoppingDBContext.SaveChangesAsync();
+
+                orderResponse.ShoppingOrderId = order.Id;
+                orderResponse.URLRedirection = order.GatewayUrlRedirection;
+                orderResponse.Status = new StatusResponse
+                {
+                    Id = (int)OrderStatus.CREATED,
+                    Status = Enum.GetName(typeof(OrderStatus), OrderStatus.CREATED)
+                };
+                orderResponse.Product = new ProductResponse
+                {
+                    ProductId = product.ProductId,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = product.Price
+                };
             }
             catch (Exception ex)
             {
