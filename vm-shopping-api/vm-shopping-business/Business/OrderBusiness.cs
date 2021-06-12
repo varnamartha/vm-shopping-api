@@ -10,6 +10,7 @@ using vm_shopping_models.Enum;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
 namespace vm_shopping_business.Business
 {
@@ -82,6 +83,47 @@ namespace vm_shopping_business.Business
                 //ToDo: Log
             }
             return orderResponse;
+        }
+
+        public async Task<List<OrderResponse>> GetClientOrders(string email)
+        {
+            List<OrderResponse> orders = new List<OrderResponse>();
+            try
+            {
+                var clientOrders = shoppingDBContext.Order
+                        .Include(x => x.Customer)
+                        .Include(x => x.Status)
+                        .Include(x => x.Product)
+                        .Where(o => o.Customer.Mail == email).ToList();
+
+                if (clientOrders.Any())
+                {
+                    foreach (var clientOrder in clientOrders)
+                    {
+                        var orderResponse = new OrderResponse();
+                        orderResponse.ShoppingOrderId = clientOrder.Id;
+                        orderResponse.URLRedirection = clientOrder.GatewayUrlRedirection;
+                        orderResponse.Status = new StatusResponse
+                        {
+                            Id = clientOrder.Status.Id,
+                            Status = clientOrder.Status.Description
+                        };
+                        orderResponse.Product = new ProductResponse
+                        {
+                            ProductId = clientOrder.Product.Id,
+                            Name = clientOrder.Product.Name,
+                            Description = clientOrder.Product.Description,
+                            Price = clientOrder.Product.Price
+                        };
+                        orders.Add(orderResponse);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //ToDo: Log
+            }
+            return orders;
         }
 
         internal async Task<OrderResponse> SaveOrder(OrderRequest orderRequest, string GatewayUrlRedirection, string GatewayPaymentId)
