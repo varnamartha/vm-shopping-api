@@ -85,3 +85,5 @@ applicationhost.config
 project.fragment.lock.json
 project.lock.json
 /.vs/*
+/vm-shopping-api/bin/*
+/vm-shopping-api/obj
