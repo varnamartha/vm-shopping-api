@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using vm_shopping_business.AutoMapper;
 using vm_shopping_business.Business;
 using vm_shopping_business.Interfaces;
 using vm_shopping_data_access;
@@ -11,8 +12,11 @@ namespace vm_shopping_business
 {
     public class ClientBusiness : BusinessBase, IClientBusiness
     {
-        public ClientBusiness(ShoppingDBContext shoppingDBContext) : base(shoppingDBContext)
+        public readonly IAutoMapperConfig autoMapperConfig;
+
+        public ClientBusiness(IAutoMapperConfig autoMapperConfig, ShoppingDBContext shoppingDBContext) : base(shoppingDBContext)
         {
+            this.autoMapperConfig = autoMapperConfig;
         }
 
         public async Task<ClientResponse> SaveClient(ClientRequest client)
@@ -23,21 +27,14 @@ namespace vm_shopping_business
                 var currentClient = shoppingDBContext.Customer.Where(t => t.Mail == client.Mail).FirstOrDefault();
                 if (currentClient == null)
                 {
-                    Customer customer = new Customer
-                    {
-                        Name = client.Name,
-                        Mail = client.Mail,
-                        Phone = client.Phone
-                    };
+                    Customer customer = autoMapperConfig.GetMapper().Map<ClientRequest, Customer>(client);
+
                     shoppingDBContext.Add(customer);
                     await shoppingDBContext.SaveChangesAsync();
                     currentClient = customer;
                 }
 
-                clientResponse.ClientId = currentClient.Id;
-                clientResponse.Name = currentClient.Name;
-                clientResponse.Email = currentClient.Mail;
-                clientResponse.Phone = currentClient.Phone;
+                clientResponse = autoMapperConfig.GetMapper().Map<Customer, ClientResponse>(currentClient);
             }
             catch (Exception ex)
             {

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using vm_shopping_business.AutoMapper;
 using vm_shopping_business.Interfaces;
 using vm_shopping_data_access;
 using vm_shopping_data_access.Entities;
@@ -14,8 +15,11 @@ namespace vm_shopping_business.Business
 {
     public class NotificationBusiness : BusinessBase, INotificationBusiness
     {
-        public NotificationBusiness(ShoppingDBContext shoppingDBContext) : base(shoppingDBContext)
+        public readonly IAutoMapperConfig autoMapperConfig;
+
+        public NotificationBusiness(IAutoMapperConfig autoMapperConfig, ShoppingDBContext shoppingDBContext) : base(shoppingDBContext)
         {
+            this.autoMapperConfig = autoMapperConfig;
         }
 
         public async Task<NotificationResponse> PaymentNotificationSync(PaymentNotificationRequest paymentNotificationRequest)
@@ -24,7 +28,7 @@ namespace vm_shopping_business.Business
             try
             {
                 var isValidSignature = validateSignatureWithPaymentNotificationRequest(paymentNotificationRequest);
-                if(!isValidSignature)
+                if (!isValidSignature)
                 {
                     notificationResponse.state = Enum.GetName(typeof(PaymentNotificationState), PaymentNotificationState.InvalidOrigin);
                     return notificationResponse;
@@ -37,7 +41,7 @@ namespace vm_shopping_business.Business
                     return notificationResponse;
                 }
 
-                var status =  shoppingDBContext.Status
+                var status = shoppingDBContext.Status
                                    .Where(t => t.Description.ToUpper() == paymentNotificationRequest.status.status.ToUpper()).FirstOrDefault();
                 if (status == null)
                 {
@@ -50,16 +54,9 @@ namespace vm_shopping_business.Business
                 order.StatusId = status.Id;
 
                 //Creating Payment notification
-                PaymentNotification paymentNotification = new PaymentNotification
-                {
-                    OrderId = order.Id,
-                    Message = paymentNotificationRequest.status.message,
-                    Reason = paymentNotificationRequest.status.reason,
-                    Reference = paymentNotificationRequest.reference,
-                    Signature = paymentNotificationRequest.signature,
-                    Date = DateTime.Parse(paymentNotificationRequest.status.date)
-
-                };
+                PaymentNotification paymentNotification = autoMapperConfig.GetMapper().Map<PaymentNotificationRequest, PaymentNotification>(paymentNotificationRequest);
+                paymentNotification.OrderId = order.Id;
+              
                 shoppingDBContext.PaymentNotification.Add(paymentNotification);
                 await shoppingDBContext.SaveChangesAsync();
 
