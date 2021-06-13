@@ -41,7 +41,7 @@ namespace vm_shopping_business
             }
             catch (Exception ex)
             {
-                //Todo
+                LogError("SaveClient", ex);
             }
 
             return clientResponse;

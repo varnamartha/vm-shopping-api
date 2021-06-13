@@ -40,7 +40,7 @@ namespace vm_shopping_business.Business
             }
             catch (Exception ex)
             {
-                //ToDo: Log
+                LogError("SaveProduct", ex);
             }
             return productResponse;
         }
