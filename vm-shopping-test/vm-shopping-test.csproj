@@ -18,4 +18,10 @@
     <ProjectReference Include="..\vm-shopping-business\vm-shopping-business.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="PlacetoPay.Integrations.Library.CSharp">
+      <HintPath>..\vm-shopping-business\bin\Debug\netcoreapp3.1\PlacetoPay.Integrations.Library.CSharp.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
