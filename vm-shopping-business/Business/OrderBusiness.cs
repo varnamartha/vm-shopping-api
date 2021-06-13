@@ -11,6 +11,8 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
+using vm_shopping_business.AutoMapper;
+using AutoMapper;
 
 namespace vm_shopping_business.Business
 {
@@ -22,11 +24,15 @@ namespace vm_shopping_business.Business
 
         public readonly IProductBusiness productBusiness;
 
-        public OrderBusiness(IGatewaySession gatewaySession, IClientBusiness clientBusiness, IProductBusiness productBusiness, ShoppingDBContext shoppingDBContext) : base(shoppingDBContext)
+        public readonly IAutoMapperConfig autoMapperConfig;
+
+
+        public OrderBusiness(IGatewaySession gatewaySession, IClientBusiness clientBusiness, IProductBusiness productBusiness, IAutoMapperConfig autoMapperConfig, ShoppingDBContext shoppingDBContext) : base(shoppingDBContext)
         {
             this.gatewaySession = gatewaySession;
             this.clientBusiness = clientBusiness;
             this.productBusiness = productBusiness;
+            this.autoMapperConfig = autoMapperConfig;
         }
 
         public async Task<OrderResponse> CreateOrder(OrderRequest orderRequest)
@@ -66,22 +72,8 @@ namespace vm_shopping_business.Business
                         .Where(o => o.Id == orderId).FirstOrDefault();
 
                 if (order != null)
-                {
-                    orderResponse = new OrderResponse();
-                    orderResponse.ShoppingOrderId = order.Id;
-                    orderResponse.URLRedirection = order.GatewayUrlRedirection;
-                    orderResponse.Status = new StatusResponse
-                    {
-                        Id = order.Status.Id,
-                        Status = order.Status.Description
-                    };
-                    orderResponse.Product = new ProductResponse
-                    {
-                        ProductId = order.Product.Id,
-                        Name = order.Product.Name,
-                        Description = order.Product.Description,
-                        Price = order.Product.Price
-                    };
+                {                   
+                    orderResponse = autoMapperConfig.GetMapper().Map<Order, OrderResponse>(order);   
                 }
             }
             catch (Exception ex)
@@ -106,21 +98,7 @@ namespace vm_shopping_business.Business
                 {
                     foreach (var clientOrder in clientOrders)
                     {
-                        var orderResponse = new OrderResponse();
-                        orderResponse.ShoppingOrderId = clientOrder.Id;
-                        orderResponse.URLRedirection = clientOrder.GatewayUrlRedirection;
-                        orderResponse.Status = new StatusResponse
-                        {
-                            Id = clientOrder.Status.Id,
-                            Status = clientOrder.Status.Description
-                        };
-                        orderResponse.Product = new ProductResponse
-                        {
-                            ProductId = clientOrder.Product.Id,
-                            Name = clientOrder.Product.Name,
-                            Description = clientOrder.Product.Description,
-                            Price = clientOrder.Product.Price
-                        };
+                        var orderResponse = autoMapperConfig.GetMapper().Map<Order, OrderResponse>(clientOrder);
                         orders.Add(orderResponse);
                     }
                 }
@@ -153,20 +131,13 @@ namespace vm_shopping_business.Business
                 shoppingDBContext.Add(order);
                 await shoppingDBContext.SaveChangesAsync();
 
-                orderResponse.ShoppingOrderId = order.Id;
-                orderResponse.URLRedirection = order.GatewayUrlRedirection;
+                orderResponse = autoMapperConfig.GetMapper().Map<Order, OrderResponse>(order);                
                 orderResponse.Status = new StatusResponse
                 {
                     Id = (int)OrderStatus.CREATED,
                     Status = Enum.GetName(typeof(OrderStatus), OrderStatus.CREATED)
                 };
-                orderResponse.Product = new ProductResponse
-                {
-                    ProductId = product.ProductId,
-                    Name = product.Name,
-                    Description = product.Description,
-                    Price = product.Price
-                };
+                orderResponse.Product = product;
             }
             catch (Exception ex)
             {
