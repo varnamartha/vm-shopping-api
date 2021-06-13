@@ -10,7 +10,7 @@ using vm_shopping_data_access;
 namespace vm_shopping_data_access.Migrations
 {
     [DbContext(typeof(ShoppingDBContext))]
-    [Migration("20210612163434_ShoppingMigration")]
+    [Migration("20210613002507_ShoppingMigration")]
     partial class ShoppingMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,6 +43,30 @@ namespace vm_shopping_data_access.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Customer");
+                });
+
+            modelBuilder.Entity("vm_shopping_data_access.Entities.Logger", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Details")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LogDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LogLevel")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Logger");
                 });
 
             modelBuilder.Entity("vm_shopping_data_access.Entities.Order", b =>

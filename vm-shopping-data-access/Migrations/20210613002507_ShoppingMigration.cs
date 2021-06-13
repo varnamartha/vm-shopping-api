@@ -7,7 +7,7 @@ namespace vm_shopping_data_access.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
+              migrationBuilder.CreateTable(
                 name: "Customer",
                 columns: table => new
                 {
@@ -20,6 +20,22 @@ namespace vm_shopping_data_access.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Customer", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Logger",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Details = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LogLevel = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LogDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Logger", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -138,6 +154,9 @@ namespace vm_shopping_data_access.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Logger");
+
             migrationBuilder.DropTable(
                 name: "PaymentNotification");
 
