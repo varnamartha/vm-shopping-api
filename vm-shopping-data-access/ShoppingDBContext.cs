@@ -17,6 +17,7 @@ namespace vm_shopping_data_access
         public virtual DbSet<Status> Status { get; set; }
         public virtual DbSet<Order> Order { get; set; }
         public virtual DbSet<PaymentNotification> PaymentNotification { get; set; }
+        public virtual DbSet<Logger> Logger { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,6 +40,10 @@ namespace vm_shopping_data_access
                 modelBuilder.Entity<PaymentNotification>()
                   .Property(c => c.Id)
                   .ValueGeneratedOnAdd();
+
+                modelBuilder.Entity<Logger>()
+                .Property(c => c.Id)
+                .ValueGeneratedOnAdd();
             }
             catch (Exception ex)
             { }
