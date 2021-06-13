@@ -31,21 +31,27 @@ namespace vm_shopping_business.Business
 
         public async Task<OrderResponse> CreateOrder(OrderRequest orderRequest)
         {
-            Amount amount = new Amount(orderRequest.Product.Price, orderRequest.Product.Currency);
-            Payment payment = new Payment(orderRequest.Product.Name, orderRequest.Product.Description, amount);
-
-            RedirectRequest request = new RedirectRequest(payment,
-                Environment.GetEnvironmentVariable("PlacetoUrlWebhook"),
-                Utils.GetLocalIPAddress(),
-                Environment.GetEnvironmentVariable("PlacetoUserAgent"),
-                DateTime.Now.AddMinutes(5).ToString(Utils.dateIso8601Format));
-
-            RedirectResponse response = gatewaySession.Session().Request(request);
-            if (response.IsSuccessful())
+            try
             {
-                return await SaveOrder(orderRequest, response.ProcessUrl, response.RequestId);
-            }
+                Amount amount = new Amount(orderRequest.Product.Price, orderRequest.Product.Currency);
+                Payment payment = new Payment(orderRequest.Product.Name, orderRequest.Product.Description, amount);
 
+                RedirectRequest request = new RedirectRequest(payment,
+                    Environment.GetEnvironmentVariable("PlacetoUrlWebhook"),
+                    Utils.GetLocalIPAddress(),
+                    Environment.GetEnvironmentVariable("PlacetoUserAgent"),
+                    DateTime.Now.AddMinutes(5).ToString(Utils.dateIso8601Format));
+
+                RedirectResponse response = gatewaySession.Session().Request(request);
+                if (response.IsSuccessful())
+                {
+                    return await SaveOrder(orderRequest, response.ProcessUrl, response.RequestId);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError("CreateOrder", ex);
+            }
             return new OrderResponse();
         }
 
@@ -80,7 +86,7 @@ namespace vm_shopping_business.Business
             }
             catch (Exception ex)
             {
-                //ToDo: Log
+                LogError("GetOrder", ex);
             }
             return orderResponse;
         }
@@ -121,7 +127,7 @@ namespace vm_shopping_business.Business
             }
             catch (Exception ex)
             {
-                //ToDo: Log
+                LogError("GetClientOrders", ex);
             }
             return orders;
         }
@@ -164,7 +170,7 @@ namespace vm_shopping_business.Business
             }
             catch (Exception ex)
             {
-                //ToDo: Log
+                LogError("SaveOrder", ex);
             }
             return orderResponse;
         }

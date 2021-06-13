@@ -67,7 +67,7 @@ namespace vm_shopping_business.Business
             }
             catch (Exception ex)
             {
-                //ToDo: Log
+                LogError("PaymentNotificationSync", ex);
                 notificationResponse.state = Enum.GetName(typeof(PaymentNotificationState), PaymentNotificationState.Error);
             }
             return notificationResponse;
