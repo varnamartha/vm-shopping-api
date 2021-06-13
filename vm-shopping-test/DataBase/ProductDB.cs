@@ -5,7 +5,7 @@ namespace vs_shopping_test.DataBase
 {
     public static class ProductDB
     {
-        public static ShoppingDBContext CreateOrderDB(ShoppingDBContext context)
+        public static ShoppingDBContext CreateProductDB(ShoppingDBContext context)
         {          
             Seed(context);
             return context;
