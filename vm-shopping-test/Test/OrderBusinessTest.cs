@@ -24,7 +24,7 @@ namespace vm_shopping_test.Test
 
         private ShoppingDBContext context;
 
-        private void InitializeBusinessClass(bool didFailed = false)
+        private void InitializeBusinessClass(bool isSuccessfullResponse = false)
         {
             if (context == null)
             {
@@ -33,7 +33,7 @@ namespace vm_shopping_test.Test
 
             gatewaySession = new GatewaySessionMock
             {
-                DidFailed = didFailed
+                IsSuccessfullResponse = isSuccessfullResponse
             };
 
             autoMapperConfig = new AutoMapperConfig();
