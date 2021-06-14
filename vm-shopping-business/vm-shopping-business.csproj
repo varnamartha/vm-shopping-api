@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>vm_shopping_business</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="6.2.0" />
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\vm-shopping-data-access\vm-shopping-data-access.csproj" />
+    <ProjectReference Include="..\vm-shopping-models\vm-shopping-models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\ExternalReferences\Release\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PlacetoPay.Integrations.Library.CSharp">
+      <HintPath>..\ExternalReferences\Release\PlacetoPay.Integrations.Library.CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp">
+      <HintPath>..\ExternalReferences\Release\RestSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="SoapHttpClient">
+      <HintPath>..\ExternalReferences\Release\SoapHttpClient.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
