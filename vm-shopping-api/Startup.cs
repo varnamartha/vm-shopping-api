@@ -46,6 +46,11 @@ namespace vm_shopping_api
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors(x => x
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
