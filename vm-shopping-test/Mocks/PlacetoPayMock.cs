@@ -8,7 +8,7 @@ namespace vm_shopping_test.Mocks
 {
     public class PlacetoPayMock : PlacetoPay.Integrations.Library.CSharp.PlacetoPay
     {
-        public bool didFailed { get; set; }
+        public bool IsSuccessfullResponse { get; set; }
 
         public PlacetoPayMock() : base("", "", new Uri("http://www.placetomock.com"))
         {
@@ -17,7 +17,7 @@ namespace vm_shopping_test.Mocks
 
         public override RedirectResponse Request(RedirectRequest redirectRequest)
         {
-            return didFailed ? SuccesfulRedirectResponse() : FailedRedirectResponse();
+            return IsSuccessfullResponse ? SuccesfulRedirectResponse() : FailedRedirectResponse();
         }
 
         private RedirectResponse SuccesfulRedirectResponse()
